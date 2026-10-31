@@ -32,7 +32,7 @@
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "@bochilteam/scraper": "^5.0.1",
-    "@chatest/baileys": "^4.4.0",
+    "@chatbridgeworld/baileys": "latest",
     "@distube/ytdl-core": "4.16.12",
     "@googleapis/youtube": "31.0.0",
     "@green-code/music-track-data": "latest",
@@ -104,6 +104,6 @@
     "protobufjs@8.8.0": true,
     "protobufjs@6.11.6": true,
     "protobufjs@7.6.6": true,
-    "@chatest/baileys@3.0.13": true
+    "@chatbridgeworld/baileys@3.0.13": true
   }
 }

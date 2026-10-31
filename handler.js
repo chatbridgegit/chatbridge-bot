@@ -48,7 +48,7 @@ async function getPromotionQuote(conn, chatId, actor, target, action) {
 
   if (permissionPreviewThumbnail && typeof conn?.waUploadToServer === 'function') {
     try {
-      const { generateWAMessage } = await import('@chatest/baileys')
+      const { generateWAMessage } = await import('@chatbridgeworld/baileys')
       const quoted = await generateWAMessage(chatId, {
         image: permissionPreviewThumbnail,
         caption: quotedText

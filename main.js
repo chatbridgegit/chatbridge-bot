@@ -17,6 +17,7 @@ import NodeCache from 'node-cache'
 import './config.js'
 import { trackPresenceUpdate } from './plugins//@beta/top.js'
 import { createProjectIdentityResolver } from './lib/whatsapp-identity.js'
+import { makeConnectionManager } from './lib/connection-manager.js'
 
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '1'
 
@@ -156,13 +157,12 @@ setInterval(async () => {
 }, 3 * 60 * 60 * 1000)
 
 const {
-  fetchLatestWaWebVersion,
+  DEFAULT_CONNECTION_CONFIG,
   makeCacheableSignalKeyStore,
   Browsers,
   jidNormalizedUser,
-  DisconnectReason,
-  makeConnectionManager
-} = await import('@chatest/baileys')
+  DisconnectReason
+} = await import('@chatbridgeworld/baileys')
 
 const { chain } = lodash
 const PORT = process.env.PORT || process.env.SERVER_PORT || 3000
@@ -310,16 +310,8 @@ global.connectionManager = connectionManager
 const { state, saveCreds } = await connectionManager.subsystems.authManager.load()
 const msgRetryCounterMap = () => {}
 const msgRetryCounterCache = new NodeCache()
-const waWebVersion = await fetchLatestWaWebVersion({ timeout: 15000 })
-const version = Array.isArray(waWebVersion?.version) && waWebVersion.version.length === 3
-  ? waWebVersion.version
-  : [2, 3000, 1049440263]
-
-if (waWebVersion?.isLatest) {
-  logSystem(`Versione WhatsApp Web rilevata: ${version.join('.')}`, 'greenBright')
-} else {
-  logSystem(`Versione WhatsApp Web non rilevata, uso fallback: ${version.join('.')}`, 'yellowBright')
-}
+const version = DEFAULT_CONNECTION_CONFIG.version
+logSystem(`Versione WhatsApp Web fornita da Baileys: ${version.join('.')}`, 'greenBright')
 
 let rl = readline.createInterface({ input: process.stdin, output: process.stdout, terminal: true })
 
@@ -447,7 +439,7 @@ const connectionOptions = {
     creds: state.creds,
     keys: makeCacheableSignalKeyStore(state.keys, logger)
   },
-  browser: pairingMode === 'qr' ? Browsers.windows('Chrome') : Browsers.macOS('Safari'),
+  browser: Browsers(pairingMode === 'qr' ? 'Chrome' : 'Safari'),
   version,
   markOnlineOnConnect: false,
   generateHighQualityLinkPreview: true,
@@ -553,7 +545,6 @@ function removeSessionFolder(dir = sessionFolder) {
   try {
     if (existsSync(dir)) rmSync(dir, { recursive: true, force: true })
     mkdirSync(dir, { recursive: true })
-    connectionManager.subsystems.authManager.clear().catch(() => {})
     logSystem(`Cartella sessione ripulita: ${dir}`, 'yellowBright')
   } catch (e) {
     console.error(chalk.red('Errore eliminazione cartella sessione:'), e)

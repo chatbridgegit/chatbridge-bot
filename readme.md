@@ -278,7 +278,7 @@ Remove-Item -Recurse -Force sessioni
 
 ## 🌉 Panoramica
 
-**ChatBridge** e un bot WhatsApp multifunzione costruito su Node.js e `@chatest/baileys`. Ogni comando e un plugin separato: puoi aggiungerne, modificarne o rimuoverne uno senza toccare il core, e le modifiche si applicano a caldo.
+**ChatBridge** e un bot WhatsApp multifunzione costruito su Node.js e `@chatbridgeworld/baileys`. Ogni comando e un plugin separato: puoi aggiungerne, modificarne o rimuoverne uno senza toccare il core, e le modifiche si applicano a caldo.
 
 | | Area | Cosa include |
 |---|---|---|
@@ -297,7 +297,7 @@ Il flusso di un messaggio, dal numero WhatsApp fino alla risposta:
 
 ```mermaid
 flowchart LR
-    WA["WhatsApp"] <-->|"@chatest/baileys"| SOCK["lib/simple.js<br/>makeWASocket"]
+    WA["WhatsApp"] <-->|"@chatbridgeworld/baileys"| SOCK["lib/simple.js<br/>makeWASocket"]
     SOCK --> MAIN["main.js<br/>sessione e database"]
     CFG["config.js<br/>owner, prefissi, API"] --> MAIN
     MAIN -->|"import dinamico"| H["handler.js<br/>dispatch dei messaggi"]
