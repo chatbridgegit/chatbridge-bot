@@ -1,0 +1,6 @@
+import { definePlugin } from '../../lib/plugin-utils.js'
+import { pluginUi } from '../../lib/plugin-font.js'
+
+function chatOf(m) { const chat = global.db.data.chats[m.chat] || (global.db.data.chats[m.chat] = {}); if (typeof chat.sologruppo !== 'boolean') chat.sologruppo = false; return chat }
+async function toggle(m, extra) { const chat = chatOf(m); const value = String(extra.text || '').trim().toLowerCase(); if (!['on', 'off'].includes(value)) return m.reply(pluginUi.box('👥 Solo Gruppo', [pluginUi.row(chat.sologruppo ? '✅' : '❌', 'Stato:', chat.sologruppo ? 'attivo' : 'disattivo'), pluginUi.row('ℹ️', 'Uso:', '.sologruppo on|off')])); const enabled = value === 'on'; chat.sologruppo = enabled; const settings = global.db.data.settings[this.user.jid] || (global.db.data.settings[this.user.jid] = {}); settings.sologruppo = enabled; global.markDbDirty?.(); return m.reply(pluginUi.box('👥 Solo Gruppo', [pluginUi.row(enabled ? '✅' : '❌', 'Stato:', enabled ? 'attivato' : 'disattivato')])) }
+export default definePlugin(toggle, { name: 'feature-sologruppo', command: 'sologruppo', category: 'access', target: 'group', roles: ['admin', 'owner'], description: 'Limita il bot ai gruppi', icon: '👥', permissions: { roles: ['admin', 'owner'] } }, { group: true })

@@ -1,0 +1,9 @@
+import { definePlugin } from '../../lib/plugin-utils.js'
+import { pluginUi } from '../../lib/plugin-font.js'
+
+const filenamePattern = /\.(?:apk|exe|msi|bat|cmd|scr|js|vbs|ps1|jar)$/i
+const mimetypePattern = /(?:android\.package-archive|x-msdownload|x-msdos-program|javascript|x-msi)/i
+function chatOf(m) { const chat = global.db.data.chats[m.chat] || (global.db.data.chats[m.chat] = {}); if (typeof chat.antivirus !== 'boolean') chat.antivirus = false; return chat }
+async function before(m, { conn, isAdmin, isBotAdmin } = {}) { const content = m.msg || {}; const fileName = String(content.fileName || content.file_name || '').split(/[\\/]/).pop(); const mimetype = String(content.mimetype || ''); const dangerous = filenamePattern.test(fileName) || mimetypePattern.test(mimetype); if (!m?.isGroup || m.isAuthenticatedSelf || isAdmin || !isBotAdmin || !chatOf(m).antivirus || !dangerous) return false; m.commandBlocked = true; await conn.sendMessage(m.chat, { delete: { remoteJid: m.chat, fromMe: !!m.key.fromMe, id: m.key.id, participant: m.key.participant || m.senderPn || m.sender } }).catch(() => {}); return true }
+async function toggle(m, extra) { const chat = chatOf(m); const value = String(extra.text || '').trim().toLowerCase(); if (!['on', 'off'].includes(value)) return m.reply(pluginUi.box('🦠 Antivirus', [pluginUi.row(chat.antivirus ? '✅' : '❌', 'Stato:', chat.antivirus ? 'attivo' : 'disattivo'), pluginUi.row('ℹ️', 'Uso:', '.antivirus on|off')])); chat.antivirus = value === 'on'; global.markDbDirty?.(); return m.reply(pluginUi.box('🦠 Antivirus', [pluginUi.row(chat.antivirus ? '✅' : '❌', 'Stato:', chat.antivirus ? 'attivato' : 'disattivato')])) }
+export default definePlugin(toggle, { name: 'feature-antivirus', command: 'antivirus', category: 'protection', target: 'group', roles: ['admin', 'owner'], description: 'Blocca allegati pericolosi', icon: '🦠', permissions: { roles: ['admin', 'owner'] } }, { group: true, before })
